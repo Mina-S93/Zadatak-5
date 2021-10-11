@@ -26,9 +26,8 @@ operations.forEach((operation) =>
 //click on =
 equal.addEventListener("click", () => {
 	let screenValue = screen.innerText.replaceAll(",", ".");
-	let result = String(
-		Math.round(eval(screenValue) * 10000000000) / 10000000000
-	).replace(".", ",");
+	let result = String(eval(screenValue)).replace(".", ",");
+	console.log(result);
 	return (screen.innerHTML = `<span>${result}</span>`);
 });
 
