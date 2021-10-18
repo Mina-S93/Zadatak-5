@@ -25,9 +25,10 @@ operations.forEach((operation) =>
 
 //click on =
 equal.addEventListener("click", () => {
-	let screenValue = screen.innerText.replaceAll(",", ".");
-	let result = String(eval(screenValue)).replace(".", ",");
+	let screenValue = screen.innerText;
+	let result = Function('"use strict"; return (' + screenValue + ")")();
 	console.log(result);
+
 	return (screen.innerHTML = `<span>${result}</span>`);
 });
 
