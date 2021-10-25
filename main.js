@@ -5,31 +5,99 @@ let equal = document.querySelector(".show-result");
 let del = document.querySelector(".del");
 let reset = document.querySelector(".reset");
 let body = document.querySelector("body");
+let resultDisplayed = false;
 
 //click on each number
 numbers.forEach((number) =>
-	number.addEventListener("click", () => {
+	number.addEventListener("click", (e) => {
+		let currentString = screen.innerHTML;
+		let lastChar = currentString[currentString.length - 1];
+
 		if (screen.innerText == "0" || screen.querySelector("span")) {
 			screen.innerText = "";
 		}
-		screen.innerText += number.value;
+
+		if (resultDisplayed === false) {
+			screen.innerHTML += e.target.innerHTML;
+		} else if (
+			(resultDisplayed === true && lastChar === "+") ||
+			lastChar === "-" ||
+			lastChar === "×" ||
+			lastChar === "/"
+		) {
+			resultDisplayed = false;
+			screen.innerHTML += e.target.innerHTML;
+		} else {
+			resultDisplayed = false;
+			screen.innerHTML = "";
+			screen.innerHTML += e.target.innerHTML;
+		}
 	})
 );
 
 //click on *, /, +, -
 operations.forEach((operation) =>
-	operation.addEventListener("click", () => {
-		screen.innerText += operation.value;
+	operation.addEventListener("click", (e) => {
+		let currentString = screen.innerHTML;
+		let lastChar = currentString[currentString.length - 1];
+
+		if (
+			lastChar === "+" ||
+			lastChar === "-" ||
+			lastChar === "×" ||
+			lastChar === "/"
+		) {
+			let newString =
+				currentString.substring(0, currentString.length - 1) +
+				e.target.innerHTML;
+			screen.innerHTML = newString;
+		} else {
+			screen.innerHTML += e.target.innerHTML;
+		}
 	})
 );
 
 //click on =
 equal.addEventListener("click", () => {
-	let screenValue = screen.innerText;
-	let result = Function('"use strict"; return (' + screenValue + ")")();
-	console.log(result);
+	let inputString = screen.innerHTML;
+	let numbers = inputString.split(/\+|\-|\×|\//g);
+	let operators = inputString.replace(/[0-9]|\./g, "").split("");
 
-	return (screen.innerHTML = `<span>${result}</span>`);
+	let divide = operators.indexOf("/");
+	while (divide != -1) {
+		numbers.splice(divide, 2, numbers[divide] / numbers[divide + 1]);
+		operators.splice(divide, 1);
+		divide = operators.indexOf("/");
+	}
+
+	let multiply = operators.indexOf("×");
+	while (multiply != -1) {
+		numbers.splice(multiply, 2, numbers[multiply] * numbers[multiply + 1]);
+		operators.splice(multiply, 1);
+		multiply = operators.indexOf("×");
+	}
+
+	let subtract = operators.indexOf("-");
+	while (subtract != -1) {
+		numbers.splice(subtract, 2, numbers[subtract] - numbers[subtract + 1]);
+		operators.splice(subtract, 1);
+		subtract = operators.indexOf("-");
+	}
+
+	let add = operators.indexOf("+");
+	while (add != -1) {
+		numbers.splice(
+			add,
+			2,
+			parseFloat(numbers[add]) + parseFloat(numbers[add + 1])
+		);
+		operators.splice(add, 1);
+		add = operators.indexOf("+");
+	}
+
+	screen.innerHTML = numbers[0];
+
+	resultDisplayed = true;
 });
 
 //click on delete
